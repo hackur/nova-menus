@@ -4,14 +4,7 @@ Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop i
 
 ## Screenshots
 
-![Menu Management Interface](docs/screenshots/menu-management.png)
-*Main menu management interface with drag-and-drop functionality*
-
-![Menu Item Editor](docs/screenshots/menu-editor.png)
-*Menu item editing with resource selection and temporal visibility*
-
-![Drag and Drop](docs/screenshots/drag-drop.png)
-*Intuitive drag-and-drop interface for menu hierarchy management*
+*Screenshots will be added once the tool interface is captured*
 
 ## Features
 
