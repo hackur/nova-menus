@@ -1,13 +1,17 @@
 # Nova Menus
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/skylark-team/nova-menus.svg?style=flat-square)](https://packagist.org/packages/skylark-team/nova-menus)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/skylark-team/nova-menus/tests.yml?label=tests)](https://github.com/skylark-team/nova-menus/actions)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/skylark-team/nova-menus/code-style.yml?label=code%20style)](https://github.com/skylark-team/nova-menus/actions)
-[![Total Downloads](https://img.shields.io/packagist/dt/skylark-team/nova-menus.svg?style=flat-square)](https://packagist.org/packages/skylark-team/nova-menus)
-
 Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop interface, temporal visibility, resource integration, and comprehensive testing.
 
-![Nova Menus Screenshot](docs/screenshot.png)
+## Screenshots
+
+![Menu Management Interface](docs/screenshots/menu-management.png)
+*Main menu management interface with drag-and-drop functionality*
+
+![Menu Item Editor](docs/screenshots/menu-editor.png)
+*Menu item editing with resource selection and temporal visibility*
+
+![Drag and Drop](docs/screenshots/drag-drop.png)
+*Intuitive drag-and-drop interface for menu hierarchy management*
 
 ## Features
 
@@ -402,7 +406,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 ## Credits
 
 - [Skylark Team](https://github.com/skylark-team)
-- [All Contributors](../../contributors)
 
 ## Support
 
