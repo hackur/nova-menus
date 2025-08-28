@@ -1,0 +1,100 @@
+{
+    "name": "skylark-team/nova-menus",
+    "description": "Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop interface, temporal visibility, and resource integration",
+    "keywords": [
+        "laravel",
+        "nova",
+        "menu",
+        "navigation",
+        "cms",
+        "hierarchy",
+        "nested",
+        "drag-drop",
+        "admin"
+    ],
+    "homepage": "https://github.com/skylark-team/nova-menus",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Skylark Team",
+            "email": "info@skylark.dev",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/skylark-team/nova-menus/issues",
+        "source": "https://github.com/skylark-team/nova-menus"
+    },
+    "require": {
+        "php": "^8.2|^8.3|^8.4",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "kalnoy/nestedset": "^6.0|^7.0"
+    },
+    "require-dev": {
+        "laravel/nova": "^4.0|^5.0",
+        "laravel/nova-devtool": "^1.7",
+        "laravel/pint": "^1.24",
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+        "orchestra/testbench": "^8.0|^9.0",
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "suggest": {
+        "laravel/nova": "Required for Nova integration (^4.0 or ^5.0)",
+        "spatie/laravel-medialibrary": "For advanced media management in menu items",
+        "spatie/laravel-permission": "For advanced permission management"
+    },
+    "repositories": [
+        { "type": "composer", "url": "https://nova.laravel.com" }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Skylark\\Menus\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Skylark\\Menus\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Skylark\\Menus\\ToolServiceProvider"
+            ]
+        },
+        "nova": {
+            "version": "1.7.0",
+            "compatibility": "^4.0|^5.0"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint",
+        "lint": "vendor/bin/pint --test",
+        "analyse": "vendor/bin/phpstan analyse",
+        "post-install-cmd": [
+            "@php artisan vendor:publish --tag=menus-config --force",
+            "@php artisan vendor:publish --tag=menus-migrations --force"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/skylark-team"
+        }
+    ]
+}

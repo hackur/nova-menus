@@ -1,0 +1,326 @@
+openapi: 3.0.3
+info:
+  title: Menu API
+  description: |
+    Public API for accessing menu data with temporal visibility and resource integration.
+    
+    This API provides hierarchical menu structures filtered by temporal visibility rules
+    and automatically excludes soft-deleted resources.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: https://your-domain.com/api
+    description: Production server
+  - url: https://staging.your-domain.com/api
+    description: Staging server
+
+paths:
+  /menus/{slug}:
+    get:
+      summary: Get single menu by slug
+      description: |
+        Retrieves a single menu with its hierarchical structure. Only active menu items
+        are included based on temporal visibility rules and resource availability.
+      operationId: getMenu
+      tags:
+        - Menus
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: The unique slug identifier for the menu
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\-_]+$'
+          example: main-menu
+      responses:
+        '200':
+          description: Menu found and returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleMenuResponse'
+              examples:
+                main-menu:
+                  summary: Main navigation menu
+                  value:
+                    slug: main-menu
+                    name: Main Navigation
+                    items:
+                      - id: 1
+                        name: Home
+                        url: /
+                        target: _self
+                        css_class: nav-home
+                        icon: home
+                        children: []
+                      - id: 2
+                        name: Products
+                        url: /products
+                        target: _self
+                        css_class: null
+                        icon: null
+                        children:
+                          - id: 3
+                            name: Electronics
+                            url: /products/electronics
+                            target: _self
+                            css_class: null
+                            icon: null
+                            children: []
+                    timestamp: "2025-08-28T10:30:00.000000Z"
+        '404':
+          description: Menu not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Menu not found
+                message: "Menu with slug 'invalid-menu' does not exist"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitResponse'
+
+  /menus:
+    get:
+      summary: Get multiple menus
+      description: |
+        Retrieves multiple menus in a single request using comma-separated slugs.
+        Each menu is returned separately with its own structure or error information.
+      operationId: getMenus
+      tags:
+        - Menus
+      parameters:
+        - name: menus
+          in: query
+          required: true
+          description: Comma-separated menu slugs
+          schema:
+            type: string
+          example: main-menu,footer-menu,sidebar-menu
+      responses:
+        '200':
+          description: Menus response (may include individual errors for missing menus)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiMenuResponse'
+              examples:
+                mixed-response:
+                  summary: Response with successful and failed menu fetches
+                  value:
+                    menus:
+                      main-menu:
+                        name: Main Navigation
+                        items:
+                          - id: 1
+                            name: Home
+                            url: /
+                            target: _self
+                            css_class: nav-home
+                            icon: home
+                            children: []
+                      footer-menu:
+                        name: Footer Navigation
+                        items:
+                          - id: 10
+                            name: About
+                            url: /about
+                            target: _self
+                            css_class: null
+                            icon: null
+                            children: []
+                      missing-menu:
+                        error: Menu not found
+                        message: "Menu with slug 'missing-menu' does not exist"
+                    timestamp: "2025-08-28T10:30:00.000000Z"
+        '400':
+          description: Bad request - no menu slugs provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: No menus specified
+                message: "Please provide comma-separated menu slugs via ?menus=slug1,slug2"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitResponse'
+
+components:
+  schemas:
+    MenuItem:
+      type: object
+      description: A single menu item with hierarchical children
+      required:
+        - id
+        - name
+        - url
+        - target
+        - children
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the menu item
+          example: 1
+        name:
+          type: string
+          description: Display name of the menu item
+          example: Home
+        url:
+          type: string
+          nullable: true
+          description: Generated URL for the menu item
+          example: /
+        target:
+          type: string
+          enum: [_self, _blank]
+          description: Link target
+          example: _self
+        css_class:
+          type: string
+          nullable: true
+          description: Optional CSS class for styling
+          example: nav-home
+        icon:
+          type: string
+          nullable: true
+          description: Optional icon identifier
+          example: home
+        children:
+          type: array
+          description: Array of child menu items
+          items:
+            $ref: '#/components/schemas/MenuItem'
+
+    SingleMenuResponse:
+      type: object
+      description: Response for single menu request
+      required:
+        - slug
+        - name
+        - items
+        - timestamp
+      properties:
+        slug:
+          type: string
+          description: Menu slug identifier
+          example: main-menu
+        name:
+          type: string
+          description: Menu display name
+          example: Main Navigation
+        items:
+          type: array
+          description: Array of root-level menu items
+          items:
+            $ref: '#/components/schemas/MenuItem'
+        timestamp:
+          type: string
+          format: date-time
+          description: Response generation timestamp in ISO 8601 format
+          example: "2025-08-28T10:30:00.000000Z"
+
+    MenuData:
+      type: object
+      description: Menu data or error information
+      oneOf:
+        - type: object
+          required:
+            - name
+            - items
+          properties:
+            name:
+              type: string
+              description: Menu display name
+              example: Main Navigation
+            items:
+              type: array
+              description: Array of menu items
+              items:
+                $ref: '#/components/schemas/MenuItem'
+        - type: object
+          required:
+            - error
+            - message
+          properties:
+            error:
+              type: string
+              description: Error type
+              example: Menu not found
+            message:
+              type: string
+              description: Detailed error message
+              example: "Menu with slug 'invalid-menu' does not exist"
+
+    MultiMenuResponse:
+      type: object
+      description: Response for multiple menu request
+      required:
+        - menus
+        - timestamp
+      properties:
+        menus:
+          type: object
+          description: Object containing menu data keyed by slug
+          additionalProperties:
+            $ref: '#/components/schemas/MenuData'
+        timestamp:
+          type: string
+          format: date-time
+          description: Response generation timestamp in ISO 8601 format
+          example: "2025-08-28T10:30:00.000000Z"
+
+    ErrorResponse:
+      type: object
+      description: Standard error response
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: Menu not found
+        message:
+          type: string
+          description: Detailed error message
+          example: "Menu with slug 'invalid-menu' does not exist"
+
+    RateLimitResponse:
+      type: object
+      description: Rate limit exceeded response
+      required:
+        - message
+        - exception
+      properties:
+        message:
+          type: string
+          description: Rate limit message
+          example: Too Many Attempts.
+        exception:
+          type: string
+          description: Exception class name
+          example: Illuminate\Http\Exceptions\ThrottleRequestsException
+
+  securitySchemes: {}
+
+security: []
+
+tags:
+  - name: Menus
+    description: Operations for accessing menu data
+
+externalDocs:
+  description: Complete API Documentation
+  url: https://your-domain.com/docs/api
