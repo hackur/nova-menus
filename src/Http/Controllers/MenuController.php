@@ -19,6 +19,14 @@ class MenuController
     public function index(): JsonResponse
     {
         try {
+            // Check if menu_items table exists
+            if (!DB::getSchemaBuilder()->hasTable('menu_items')) {
+                return response()->json([
+                    'data' => [],
+                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate'
+                ]);
+            }
+
             $menus = MenuItem::roots()
                 ->select(['id', 'name', 'slug', 'max_depth', 'is_active', 'created_at', 'updated_at', '_lft', '_rgt'])
                 ->get()
@@ -56,6 +64,14 @@ class MenuController
     public function store(Request $request): JsonResponse
     {
         try {
+            // Check if menu_items table exists
+            if (!DB::getSchemaBuilder()->hasTable('menu_items')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate'
+                ], 500);
+            }
+
             $validated = $request->validate([
                 'name' => 'required|string|min:3|max:255',
                 'slug' => 'nullable|string|max:255|unique:menu_items,slug',

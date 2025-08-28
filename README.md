@@ -4,7 +4,11 @@ Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop i
 
 ## Screenshots
 
-*Screenshots will be added once the tool interface is captured*
+![Menu Management Interface](docs/screenshots/menu-management.png)
+*Main menu management interface with Nova integration*
+
+![Create Menu Modal](docs/screenshots/menu-creation-modal.png)
+*Menu creation modal with configuration options*
 
 ## Features
 
