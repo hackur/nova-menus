@@ -1,6 +1,6 @@
 # Nova Menus
 
-Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop interface, temporal visibility, resource integration, and comprehensive testing.
+Advanced hierarchical menu management tool for Laravel Nova with intuitive drag-and-drop interface, temporal visibility, resource integration, and comprehensive testing.
 
 ## Screenshots
 
