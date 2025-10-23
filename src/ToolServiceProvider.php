@@ -64,6 +64,19 @@ class ToolServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/menus.php', 'menus'
         );
+
+        // Register publishable resources
+        if ($this->app->runningInConsole()) {
+            // Publish migrations
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'menus-migrations');
+
+            // Publish configuration
+            $this->publishes([
+                __DIR__.'/../config/menus.php' => config_path('menus.php'),
+            ], 'menus-config');
+        }
     }
 
     /**
