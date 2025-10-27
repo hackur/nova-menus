@@ -1,5 +1,5 @@
 {
-    "name": "skylark-team/nova-menus",
+    "name": "pcrcard/nova-menus",
     "description": "Advanced hierarchical menu management tool for Laravel Nova with drag-and-drop interface, temporal visibility, and resource integration",
     "keywords": [
         "laravel",
