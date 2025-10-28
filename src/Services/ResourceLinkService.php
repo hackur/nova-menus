@@ -94,7 +94,7 @@ class ResourceLinkService
 
         // Check if model supports soft deletes
         $usesSoftDeletes = in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive($model));
-        
+
         if ($usesSoftDeletes) {
             $resource = $model::withTrashed()->find($resourceId);
         } else {

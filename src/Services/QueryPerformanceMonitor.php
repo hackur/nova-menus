@@ -4,13 +4,15 @@ namespace Skylark\Menus\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 
 class QueryPerformanceMonitor
 {
     protected array $queries = [];
+
     protected array $slowQueries = [];
+
     protected float $slowQueryThreshold = 100.0; // milliseconds
+
     protected bool $isListening = false;
 
     public function __construct(float $slowQueryThreshold = 100.0)
@@ -42,7 +44,7 @@ class QueryPerformanceMonitor
     public function stopMonitoring(): array
     {
         $this->isListening = false;
-        
+
         return $this->getStatistics();
     }
 
@@ -57,7 +59,7 @@ class QueryPerformanceMonitor
             'time' => $query->time,
             'connection' => $query->connectionName,
             'timestamp' => microtime(true),
-            'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
+            'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10),
         ];
 
         $this->queries[] = $queryData;
@@ -65,12 +67,12 @@ class QueryPerformanceMonitor
         // Track slow queries
         if ($query->time > $this->slowQueryThreshold) {
             $this->slowQueries[] = $queryData;
-            
+
             // Log slow queries if enabled
             if (config('menus.log_slow_queries', false)) {
                 Log::warning('Slow menu query detected', [
                     'sql' => $query->sql,
-                    'time' => $query->time . 'ms',
+                    'time' => $query->time.'ms',
                     'bindings' => $query->bindings,
                 ]);
             }
@@ -85,7 +87,7 @@ class QueryPerformanceMonitor
         $totalQueries = count($this->queries);
         $totalTime = array_sum(array_column($this->queries, 'time'));
         $slowQueriesCount = count($this->slowQueries);
-        
+
         return [
             'total_queries' => $totalQueries,
             'total_time' => round($totalTime, 2),
@@ -118,7 +120,7 @@ class QueryPerformanceMonitor
         $queryPatterns = [];
         foreach ($this->queries as $query) {
             $pattern = $this->normalizeQuery($query['sql']);
-            if (!isset($queryPatterns[$pattern])) {
+            if (! isset($queryPatterns[$pattern])) {
                 $queryPatterns[$pattern] = [];
             }
             $queryPatterns[$pattern][] = $query;
@@ -139,8 +141,8 @@ class QueryPerformanceMonitor
         // Detect duplicate queries (exact matches)
         $exactQueries = [];
         foreach ($this->queries as $query) {
-            $key = md5($query['sql'] . serialize($query['bindings']));
-            if (!isset($exactQueries[$key])) {
+            $key = md5($query['sql'].serialize($query['bindings']));
+            if (! isset($exactQueries[$key])) {
                 $exactQueries[$key] = [];
             }
             $exactQueries[$key][] = $query;
@@ -198,22 +200,22 @@ class QueryPerformanceMonitor
     public function monitor(callable $operation): array
     {
         $this->startMonitoring();
-        
+
         $startTime = microtime(true);
         $startMemory = memory_get_usage(true);
-        
+
         $result = $operation();
-        
+
         $endTime = microtime(true);
         $endMemory = memory_get_usage(true);
-        
+
         $stats = $this->stopMonitoring();
-        
+
         $stats['operation_time'] = round(($endTime - $startTime) * 1000, 2); // milliseconds
         $stats['memory_usage'] = $endMemory - $startMemory;
         $stats['peak_memory'] = memory_get_peak_usage(true);
         $stats['result'] = $result;
-        
+
         return $stats;
     }
 
@@ -223,35 +225,35 @@ class QueryPerformanceMonitor
     public function generateReport(): string
     {
         $stats = $this->getStatistics();
-        
+
         $report = "Database Query Performance Report\n";
         $report .= "================================\n\n";
-        
+
         $report .= "Summary:\n";
         $report .= "- Total Queries: {$stats['total_queries']}\n";
         $report .= "- Total Time: {$stats['total_time']}ms\n";
         $report .= "- Average Time: {$stats['average_time']}ms\n";
         $report .= "- Slow Queries: {$stats['slow_queries_count']} ({$stats['slow_queries_percentage']}%)\n\n";
-        
-        if (!empty($stats['query_analysis']['n_plus_one_potential'])) {
+
+        if (! empty($stats['query_analysis']['n_plus_one_potential'])) {
             $report .= "Potential N+1 Query Issues:\n";
             foreach ($stats['query_analysis']['n_plus_one_potential'] as $issue) {
                 $report .= "- Pattern executed {$issue['count']} times ({$issue['total_time']}ms total)\n";
-                $report .= "  SQL: " . substr($issue['example_sql'], 0, 100) . "...\n";
+                $report .= '  SQL: '.substr($issue['example_sql'], 0, 100)."...\n";
             }
             $report .= "\n";
         }
-        
-        if (!empty($stats['query_analysis']['duplicate_queries'])) {
+
+        if (! empty($stats['query_analysis']['duplicate_queries'])) {
             $report .= "Duplicate Queries:\n";
             foreach ($stats['query_analysis']['duplicate_queries'] as $duplicate) {
                 $report .= "- Query executed {$duplicate['count']} times ({$duplicate['total_time']}ms total)\n";
-                $report .= "  SQL: " . substr($duplicate['sql'], 0, 100) . "...\n";
+                $report .= '  SQL: '.substr($duplicate['sql'], 0, 100)."...\n";
             }
             $report .= "\n";
         }
-        
-        if (!empty($stats['slow_queries'])) {
+
+        if (! empty($stats['slow_queries'])) {
             $report .= "Slowest Queries:\n";
             $slowest = array_slice(
                 array_sort($stats['slow_queries'], function ($query) {
@@ -260,12 +262,12 @@ class QueryPerformanceMonitor
                 0,
                 5
             );
-            
+
             foreach ($slowest as $query) {
-                $report .= "- {$query['time']}ms: " . substr($query['sql'], 0, 100) . "...\n";
+                $report .= "- {$query['time']}ms: ".substr($query['sql'], 0, 100)."...\n";
             }
         }
-        
+
         return $report;
     }
 
@@ -276,10 +278,10 @@ class QueryPerformanceMonitor
     {
         $suggestions = [];
         $stats = $this->getStatistics();
-        
+
         foreach ($this->queries as $query) {
             $sql = strtolower($query['sql']);
-            
+
             // Check for menu-related queries without proper indexing
             if (strpos($sql, 'menu_items') !== false) {
                 if ($query['time'] > $this->slowQueryThreshold) {
@@ -291,7 +293,7 @@ class QueryPerformanceMonitor
                             'time' => $query['time'],
                         ];
                     }
-                    
+
                     if (strpos($sql, 'where') !== false && strpos($sql, 'menu_id') !== false) {
                         $suggestions[] = [
                             'type' => 'index',
@@ -301,7 +303,7 @@ class QueryPerformanceMonitor
                         ];
                     }
                 }
-                
+
                 // Check for missing eager loading
                 if (strpos($sql, 'select * from') === 0) {
                     $suggestions[] = [
@@ -313,7 +315,7 @@ class QueryPerformanceMonitor
                 }
             }
         }
-        
+
         // Check for N+1 issues specific to menu hierarchies
         $analysis = $stats['query_analysis'];
         foreach ($analysis['n_plus_one_potential'] as $nPlusOne) {
@@ -327,7 +329,7 @@ class QueryPerformanceMonitor
                 ];
             }
         }
-        
+
         return array_unique($suggestions, SORT_REGULAR);
     }
 

@@ -20,10 +20,10 @@ class MenuController
     {
         try {
             // Check if menu_items table exists
-            if (!DB::getSchemaBuilder()->hasTable('menu_items')) {
+            if (! DB::getSchemaBuilder()->hasTable('menu_items')) {
                 return response()->json([
                     'data' => [],
-                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate'
+                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate',
                 ]);
             }
 
@@ -65,10 +65,10 @@ class MenuController
     {
         try {
             // Check if menu_items table exists
-            if (!DB::getSchemaBuilder()->hasTable('menu_items')) {
+            if (! DB::getSchemaBuilder()->hasTable('menu_items')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate'
+                    'message' => 'Menu system not installed. Please run: php artisan vendor:publish --tag="menus-migrations" && php artisan migrate',
                 ], 500);
             }
 
@@ -223,6 +223,7 @@ class MenuController
                         $resourceData = $item->getResourceData();
                         $item->resource_name = $resourceData['name'] ?? null;
                     }
+
                     return $item;
                 })
                 ->toTree();       // Convert to hierarchical tree structure

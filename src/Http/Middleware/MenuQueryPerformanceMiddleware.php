@@ -23,7 +23,7 @@ class MenuQueryPerformanceMiddleware
     public function handle(Request $request, Closure $next)
     {
         // Only monitor if performance monitoring is enabled
-        if (!config('menus.performance_monitoring', false)) {
+        if (! config('menus.performance_monitoring', false)) {
             return $next($request);
         }
 
@@ -48,10 +48,10 @@ class MenuQueryPerformanceMiddleware
         // Add headers with performance information (in debug mode)
         if (config('app.debug') && config('menus.performance_headers', false)) {
             $response->headers->set('X-Menu-Queries', $stats['total_queries']);
-            $response->headers->set('X-Menu-Query-Time', $stats['total_time'] . 'ms');
-            $response->headers->set('X-Menu-Request-Time', number_format($totalTime, 2) . 'ms');
+            $response->headers->set('X-Menu-Query-Time', $stats['total_time'].'ms');
+            $response->headers->set('X-Menu-Request-Time', number_format($totalTime, 2).'ms');
             $response->headers->set('X-Menu-Memory-Usage', $this->formatBytes($memoryUsage));
-            
+
             if ($stats['slow_queries_count'] > 0) {
                 $response->headers->set('X-Menu-Slow-Queries', $stats['slow_queries_count']);
             }
@@ -59,7 +59,7 @@ class MenuQueryPerformanceMiddleware
 
         // Log performance metrics if threshold is exceeded
         $performanceThreshold = config('menus.performance_log_threshold', 1000); // 1 second default
-        
+
         if ($totalTime > $performanceThreshold || $stats['slow_queries_count'] > 0) {
             $this->logPerformanceMetrics($request, $stats, $totalTime, $memoryUsage);
         }
@@ -81,8 +81,8 @@ class MenuQueryPerformanceMiddleware
             'url' => $request->url(),
             'method' => $request->method(),
             'user_id' => auth()->id(),
-            'total_time' => number_format($totalTime, 2) . 'ms',
-            'query_time' => $stats['total_time'] . 'ms',
+            'total_time' => number_format($totalTime, 2).'ms',
+            'query_time' => $stats['total_time'].'ms',
             'query_count' => $stats['total_queries'],
             'slow_queries' => $stats['slow_queries_count'],
             'memory_usage' => $this->formatBytes($memoryUsage),
@@ -93,7 +93,7 @@ class MenuQueryPerformanceMiddleware
             $logData['slow_query_details'] = array_map(function ($query) {
                 return [
                     'sql' => $query['sql'],
-                    'time' => $query['time'] . 'ms',
+                    'time' => $query['time'].'ms',
                     'bindings' => $query['bindings'],
                 ];
             }, array_slice($stats['slow_queries'], 0, 3)); // Log first 3 slow queries
@@ -101,7 +101,7 @@ class MenuQueryPerformanceMiddleware
 
         // Add optimization suggestions
         $suggestions = $this->monitor->getMenuOptimizationSuggestions();
-        if (!empty($suggestions)) {
+        if (! empty($suggestions)) {
             $logData['optimization_suggestions'] = array_slice($suggestions, 0, 3);
         }
 
@@ -134,15 +134,15 @@ class MenuQueryPerformanceMiddleware
         ];
 
         // Example: Store in cache for later analysis
-        $cacheKey = 'menu_performance_' . now()->format('Y-m-d-H');
+        $cacheKey = 'menu_performance_'.now()->format('Y-m-d-H');
         $existingData = cache()->get($cacheKey, []);
         $existingData[] = $performanceData;
-        
+
         // Keep only last 100 entries per hour
         if (count($existingData) > 100) {
             $existingData = array_slice($existingData, -100);
         }
-        
+
         cache()->put($cacheKey, $existingData, now()->addHours(24));
 
         // Example: Send to external monitoring service
@@ -162,10 +162,10 @@ class MenuQueryPerformanceMiddleware
 
             if ($endpoint && $apiKey) {
                 // Example implementation - adjust based on your monitoring service
-                $client = new \GuzzleHttp\Client();
+                $client = new \GuzzleHttp\Client;
                 $client->post($endpoint, [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $apiKey,
+                        'Authorization' => 'Bearer '.$apiKey,
                         'Content-Type' => 'application/json',
                     ],
                     'json' => [
@@ -197,7 +197,7 @@ class MenuQueryPerformanceMiddleware
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
 
-        return round($bytes / (1024 ** $pow), 2) . ' ' . $units[$pow];
+        return round($bytes / (1024 ** $pow), 2).' '.$units[$pow];
     }
 
     /**
@@ -206,12 +206,12 @@ class MenuQueryPerformanceMiddleware
     protected function generatePerformanceSummary(array $stats, float $totalTime): array
     {
         return [
-            'request_time' => number_format($totalTime, 2) . 'ms',
+            'request_time' => number_format($totalTime, 2).'ms',
             'database' => [
                 'queries' => $stats['total_queries'],
-                'time' => $stats['total_time'] . 'ms',
+                'time' => $stats['total_time'].'ms',
                 'slow_queries' => $stats['slow_queries_count'],
-                'average_time' => $stats['average_time'] . 'ms',
+                'average_time' => $stats['average_time'].'ms',
             ],
             'analysis' => [
                 'potential_n_plus_one' => count($stats['query_analysis']['n_plus_one_potential']),

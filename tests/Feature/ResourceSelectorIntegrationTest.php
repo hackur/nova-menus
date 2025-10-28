@@ -8,7 +8,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->artisan('migrate', ['--force' => true]);
-    
+
     // Set up resource configuration for testing
     config()->set('menus.resources.Product', [
         'model' => 'App\\Models\\Product',
@@ -16,7 +16,7 @@ beforeEach(function () {
         'slug_field' => 'slug',
         'route_pattern' => '/products/{slug}',
     ]);
-    
+
     // Create a test menu
     $this->menu = MenuItem::factory()->asMenu()->create([
         'name' => 'Test Menu',
@@ -35,7 +35,7 @@ describe('ResourceSelector Integration', function () {
         ]);
 
         // Simulate the initialization logic from Nested.vue
-        if (!isset($item->link_type)) {
+        if (! isset($item->link_type)) {
             if ($item->resource_type && $item->resource_id) {
                 $item->link_type = 'resource';
             } elseif ($item->custom_url) {
@@ -60,7 +60,7 @@ describe('ResourceSelector Integration', function () {
         ]);
 
         // Simulate the initialization logic from Nested.vue
-        if (!isset($item->link_type)) {
+        if (! isset($item->link_type)) {
             if ($item->resource_type && $item->resource_id) {
                 $item->link_type = 'resource';
             } elseif ($item->custom_url) {
@@ -88,7 +88,7 @@ describe('ResourceSelector Integration', function () {
         $item->resource_name = 'Another Product Name';
 
         // Simulate resourceSelection initialization from Nested.vue
-        if (!isset($item->resourceSelection)) {
+        if (! isset($item->resourceSelection)) {
             $item->resourceSelection = [
                 'resource_type' => $item->resource_type,
                 'resource_id' => $item->resource_id,
@@ -123,7 +123,7 @@ describe('ResourceSelector Integration', function () {
 
         // Simulate switching to URL type
         $item->link_type = 'url';
-        
+
         // Simulate onLinkTypeChange logic
         if ($item->link_type === 'url') {
             $item->resource_type = null;
@@ -202,10 +202,10 @@ describe('Public API Resource Filtering', function () {
         expect($item->hasValidResource())->toBeTrue();
 
         // Test that item passes visibility filtering
-        $isVisible = $item->is_active && 
-                    (!$item->display_at || now()->gte($item->display_at)) &&
-                    (!$item->hide_at || now()->lt($item->hide_at));
-                    
+        $isVisible = $item->is_active &&
+                    (! $item->display_at || now()->gte($item->display_at)) &&
+                    (! $item->hide_at || now()->lt($item->hide_at));
+
         expect($isVisible)->toBeTrue();
     });
 

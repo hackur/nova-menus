@@ -7,22 +7,27 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->artisan('migrate', ['--force' => true]);
-    $this->service = new ResourceLinkService();
+    $this->service = new ResourceLinkService;
 });
 
 describe('ResourceLinkService SoftDelete Handling', function () {
     test('can handle models without SoftDeletes trait', function () {
         // Mock a model class that doesn't use SoftDeletes
-        $modelClass = new class extends \Illuminate\Database\Eloquent\Model {
+        $modelClass = new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'test_resources';
+
             protected $fillable = ['name', 'slug'];
+
             public $timestamps = false;
-            
-            public static function find($id) {
-                return new static(['id' => $id, 'name' => 'Test Resource', 'slug' => 'test-slug']);
+
+            public static function find($id)
+            {
+                return new self(['id' => $id, 'name' => 'Test Resource', 'slug' => 'test-slug']);
             }
-            
-            public function getKey() {
+
+            public function getKey()
+            {
                 return $this->attributes['id'] ?? null;
             }
         };
@@ -31,7 +36,7 @@ describe('ResourceLinkService SoftDelete Handling', function () {
         config()->set('menus.resources.TestResource', [
             'model' => get_class($modelClass),
             'name_field' => 'name',
-            'slug_field' => 'slug', 
+            'slug_field' => 'slug',
             'route_pattern' => '/test/{slug}',
         ]);
 
@@ -46,29 +51,37 @@ describe('ResourceLinkService SoftDelete Handling', function () {
 
     test('can handle models with SoftDeletes trait', function () {
         // Mock a model class that uses SoftDeletes
-        $modelClass = new class extends \Illuminate\Database\Eloquent\Model {
+        $modelClass = new class extends \Illuminate\Database\Eloquent\Model
+        {
             use \Illuminate\Database\Eloquent\SoftDeletes;
-            
+
             protected $table = 'soft_delete_resources';
+
             protected $fillable = ['name', 'slug'];
+
             public $timestamps = false;
-            
-            public static function withTrashed() {
-                return new static();
+
+            public static function withTrashed()
+            {
+                return new self;
             }
-            
-            public static function find($id) {
-                $instance = new static(['id' => $id, 'name' => 'Soft Delete Resource', 'slug' => 'soft-slug']);
+
+            public static function find($id)
+            {
+                $instance = new self(['id' => $id, 'name' => 'Soft Delete Resource', 'slug' => 'soft-slug']);
                 $instance->deleted_at = null; // Not deleted
+
                 return $instance;
             }
-            
-            public function getKey() {
+
+            public function getKey()
+            {
                 return $this->attributes['id'] ?? null;
             }
-            
-            public function trashed() {
-                return !is_null($this->deleted_at);
+
+            public function trashed()
+            {
+                return ! is_null($this->deleted_at);
             }
         };
 
@@ -91,35 +104,45 @@ describe('ResourceLinkService SoftDelete Handling', function () {
 
     test('searchResources works without SoftDeletes trait', function () {
         // Mock a collection result
-        $modelClass = new class extends \Illuminate\Database\Eloquent\Model {
+        $modelClass = new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'search_resources';
+
             protected $fillable = ['name', 'slug'];
+
             public $timestamps = false;
-            
-            public static function query() {
-                return new class {
-                    public function where($field, $operator, $value) {
+
+            public static function query()
+            {
+                return new class
+                {
+                    public function where($field, $operator, $value)
+                    {
                         return $this;
                     }
-                    
-                    public function limit($limit) {
+
+                    public function limit($limit)
+                    {
                         return $this;
                     }
-                    
-                    public function get($fields = ['*']) {
+
+                    public function get($fields = ['*'])
+                    {
                         return collect([
-                            (object)['id' => 1, 'name' => 'Search Result 1', 'slug' => 'result-1'],
-                            (object)['id' => 2, 'name' => 'Search Result 2', 'slug' => 'result-2'],
+                            (object) ['id' => 1, 'name' => 'Search Result 1', 'slug' => 'result-1'],
+                            (object) ['id' => 2, 'name' => 'Search Result 2', 'slug' => 'result-2'],
                         ]);
                     }
                 };
             }
-            
-            public function getKey() {
+
+            public function getKey()
+            {
                 return $this->attributes['id'] ?? null;
             }
-            
-            public function getKeyName() {
+
+            public function getKeyName()
+            {
                 return 'id';
             }
         };

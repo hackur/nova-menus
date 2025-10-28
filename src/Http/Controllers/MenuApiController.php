@@ -124,7 +124,7 @@ class MenuApiController extends Controller
             if (! $this->isItemVisible($item)) {
                 $hiddenItems->push($item->id);
             }
-            
+
             // Check resource validity separately with better error handling
             if ($item->resource_type && $item->resource_id) {
                 try {
@@ -139,7 +139,7 @@ class MenuApiController extends Controller
                         'resource_id' => $item->resource_id,
                         'error' => $e->getMessage(),
                     ]);
-                    
+
                     // Only hide if there's no fallback URL
                     if (! $item->custom_url) {
                         $hiddenItems->push($item->id);

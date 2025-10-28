@@ -55,10 +55,10 @@ describe('Large Menu Performance Tests', function () {
 
         // Log performance metrics
         echo "\nPerformance Metrics for 100 Items:\n";
-        echo "Creation Time: " . number_format($creationTime, 4) . " seconds\n";
-        echo "Retrieval Time: " . number_format($retrievalTime, 4) . " seconds\n";
-        echo "Creation Memory: " . number_format($creationMemory / 1024 / 1024, 2) . " MB\n";
-        echo "Retrieval Memory: " . number_format($retrievalMemory / 1024 / 1024, 2) . " MB\n";
+        echo 'Creation Time: '.number_format($creationTime, 4)." seconds\n";
+        echo 'Retrieval Time: '.number_format($retrievalTime, 4)." seconds\n";
+        echo 'Creation Memory: '.number_format($creationMemory / 1024 / 1024, 2)." MB\n";
+        echo 'Retrieval Memory: '.number_format($retrievalMemory / 1024 / 1024, 2)." MB\n";
     });
 
     test('can handle deep nested hierarchy efficiently', function () {
@@ -106,10 +106,10 @@ describe('Large Menu Performance Tests', function () {
 
         // Test nested set operations performance
         $nestedSetStartTime = microtime(true);
-        
+
         $depth = $deepestItem->depth;
         $isDescendantOf = $deepestItem->isDescendantOf($items[0]);
-        
+
         $nestedSetTime = microtime(true) - $nestedSetStartTime;
 
         // Assert performance benchmarks
@@ -125,10 +125,10 @@ describe('Large Menu Performance Tests', function () {
         expect($isDescendantOf)->toBeTrue();
 
         echo "\nPerformance Metrics for Deep Hierarchy (6 levels):\n";
-        echo "Creation Time: " . number_format($creationTime, 4) . " seconds\n";
-        echo "Retrieval Time: " . number_format($retrievalTime, 4) . " seconds\n";
-        echo "Nested Set Time: " . number_format($nestedSetTime, 4) . " seconds\n";
-        echo "Creation Memory: " . number_format($creationMemory / 1024 / 1024, 2) . " MB\n";
+        echo 'Creation Time: '.number_format($creationTime, 4)." seconds\n";
+        echo 'Retrieval Time: '.number_format($retrievalTime, 4)." seconds\n";
+        echo 'Nested Set Time: '.number_format($nestedSetTime, 4)." seconds\n";
+        echo 'Creation Memory: '.number_format($creationMemory / 1024 / 1024, 2)." MB\n";
     });
 
     test('can handle complex mixed hierarchy efficiently', function () {
@@ -143,7 +143,7 @@ describe('Large Menu Performance Tests', function () {
 
         // Create complex structure: 10 top-level items, each with 5 children, each with 3 grandchildren
         $allItems = [];
-        
+
         for ($i = 1; $i <= 10; $i++) {
             $topLevel = MenuItem::factory()->forMenu($rootMenu)->create([
                 'name' => "Top Level {$i}",
@@ -185,7 +185,7 @@ describe('Large Menu Performance Tests', function () {
         // Various hierarchical operations
         $topLevelItems = $rootMenu->children()->orderBy('position')->get();
         $totalDescendants = $rootMenu->descendants()->count();
-        $secondLevelCounts = $topLevelItems->map(fn($item) => $item->children()->count());
+        $secondLevelCounts = $topLevelItems->map(fn ($item) => $item->children()->count());
         $deepestItems = MenuItem::where('menu_id', $rootMenu->id)
             ->whereHas('parent.parent') // Has grandparent (3rd level items)
             ->count();
@@ -195,14 +195,14 @@ describe('Large Menu Performance Tests', function () {
 
         // Test bulk operations performance
         $bulkStartTime = microtime(true);
-        
+
         // Update all items at once
         MenuItem::where('menu_id', $rootMenu->id)->update(['is_active' => true]);
-        
+
         // Count items by level
         $rootCount = MenuItem::roots()->where('menu_id', $rootMenu->id)->count();
         $allItemsCount = MenuItem::where('menu_id', $rootMenu->id)->count();
-        
+
         $bulkTime = microtime(true) - $bulkStartTime;
 
         // Assert performance benchmarks
@@ -218,11 +218,11 @@ describe('Large Menu Performance Tests', function () {
         expect($allItemsCount)->toBe(210); // 10 + 50 + 150 (excluding root menu)
 
         echo "\nPerformance Metrics for Complex Hierarchy (210 items, 3 levels):\n";
-        echo "Creation Time: " . number_format($creationTime, 4) . " seconds\n";
-        echo "Query Time: " . number_format($queryTime, 4) . " seconds\n";
-        echo "Bulk Operations Time: " . number_format($bulkTime, 4) . " seconds\n";
-        echo "Creation Memory: " . number_format($creationMemory / 1024 / 1024, 2) . " MB\n";
-        echo "Query Memory: " . number_format($queryMemory / 1024 / 1024, 2) . " MB\n";
+        echo 'Creation Time: '.number_format($creationTime, 4)." seconds\n";
+        echo 'Query Time: '.number_format($queryTime, 4)." seconds\n";
+        echo 'Bulk Operations Time: '.number_format($bulkTime, 4)." seconds\n";
+        echo 'Creation Memory: '.number_format($creationMemory / 1024 / 1024, 2)." MB\n";
+        echo 'Query Memory: '.number_format($queryMemory / 1024 / 1024, 2)." MB\n";
     });
 
     test('can handle visibility filtering on large dataset efficiently', function () {
@@ -252,17 +252,17 @@ describe('Large Menu Performance Tests', function () {
                 'custom_url' => "/vis-{$i}",
                 'position' => $i,
                 'is_active' => $visibilityType !== 'always_hide',
-                'display_at' => match($visibilityType) {
+                'display_at' => match ($visibilityType) {
                     'future' => $now->copy()->addDays(1),
                     'past' => $now->copy()->subDays(2),
                     'current' => $now->copy()->subHours(1),
                     default => null
                 },
-                'hide_at' => match($visibilityType) {
+                'hide_at' => match ($visibilityType) {
                     'past' => $now->copy()->subDays(1),
                     'current' => $now->copy()->addHours(1),
                     default => null
-                }
+                },
             ]);
 
             $items[] = $item;
@@ -309,10 +309,10 @@ describe('Large Menu Performance Tests', function () {
         expect($scheduledItems->count())->toBe(30); // future (10) + past (10) + current (10)
 
         echo "\nPerformance Metrics for Visibility Filtering (50 items):\n";
-        echo "Creation Time: " . number_format($creationTime, 4) . " seconds\n";
-        echo "Filtering Time: " . number_format($filterTime, 4) . " seconds\n";
+        echo 'Creation Time: '.number_format($creationTime, 4)." seconds\n";
+        echo 'Filtering Time: '.number_format($filterTime, 4)." seconds\n";
         echo "Database Queries: {$queryCount}\n";
-        echo "Filter Memory: " . number_format($filterMemory / 1024 / 1024, 2) . " MB\n";
+        echo 'Filter Memory: '.number_format($filterMemory / 1024 / 1024, 2)." MB\n";
         echo "Visible Items: {$visibleItems->count()}/50\n";
         echo "Active Items: {$activeItems->count()}/50\n";
         echo "Scheduled Items: {$scheduledItems->count()}/50\n";
@@ -336,7 +336,7 @@ describe('Large Menu Performance Tests', function () {
         for ($i = 0; $i < 5; $i++) {
             try {
                 $operationStart = microtime(true);
-                
+
                 // Different types of operations that might happen concurrently
                 switch ($i % 3) {
                     case 0:
@@ -344,9 +344,9 @@ describe('Large Menu Performance Tests', function () {
                         $items = MenuItem::where('menu_id', $rootMenu->id)
                             ->with('children')
                             ->get();
-                        $results[] = "Read: " . $items->count() . " items";
+                        $results[] = 'Read: '.$items->count().' items';
                         break;
-                        
+
                     case 1:
                         // Write operations
                         $newItem = MenuItem::factory()->create([
@@ -354,21 +354,21 @@ describe('Large Menu Performance Tests', function () {
                             'name' => "Concurrent Item {$i}",
                             'position' => 100 + $i,
                         ]);
-                        $results[] = "Write: Created item ID " . $newItem->id;
+                        $results[] = 'Write: Created item ID '.$newItem->id;
                         break;
-                        
+
                     case 2:
                         // Update operations
                         MenuItem::where('menu_id', $rootMenu->id)
                             ->limit(5)
                             ->update(['is_active' => true]);
-                        $results[] = "Update: Updated items";
+                        $results[] = 'Update: Updated items';
                         break;
                 }
-                
+
                 $operationTime = microtime(true) - $operationStart;
                 expect($operationTime)->toBeLessThan(1.0); // Each operation should be fast
-                
+
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             }
@@ -382,9 +382,9 @@ describe('Large Menu Performance Tests', function () {
         expect($totalTime)->toBeLessThan(3.0); // All operations should complete in < 3 seconds
 
         echo "\nConcurrency Test Results:\n";
-        echo "Total Time: " . number_format($totalTime, 4) . " seconds\n";
-        echo "Operations: " . implode(', ', $results) . "\n";
-        echo "Errors: " . (empty($errors) ? 'None' : implode(', ', $errors)) . "\n";
+        echo 'Total Time: '.number_format($totalTime, 4)." seconds\n";
+        echo 'Operations: '.implode(', ', $results)."\n";
+        echo 'Errors: '.(empty($errors) ? 'None' : implode(', ', $errors))."\n";
     });
 
     test('can handle menu tree serialization performance', function () {
@@ -432,23 +432,23 @@ describe('Large Menu Performance Tests', function () {
 
         // Convert to array (simulating API response)
         $treeArray = $fullTree->toArray();
-        
+
         // Convert to JSON (simulating frontend data)
         $jsonTree = json_encode($treeArray);
-        
+
         $serializationTime = microtime(true) - $serializationStartTime;
         $serializationMemory = memory_get_usage(true) - $serializationStartMemory;
 
         // Test deserialization performance
         $deserializationStartTime = microtime(true);
-        
+
         $decodedTree = json_decode($jsonTree, true);
         $itemCount = collect($decodedTree)->sum(function ($parent) {
             return 1 + collect($parent['children'])->sum(function ($child) {
                 return 1 + count($child['children']);
             });
         });
-        
+
         $deserializationTime = microtime(true) - $deserializationStartTime;
 
         // Assert performance benchmarks
@@ -466,9 +466,9 @@ describe('Large Menu Performance Tests', function () {
 
         echo "\nSerialization Performance Metrics:\n";
         echo "Items: 5 parents + 20 children + 40 grandchildren = 65 total\n";
-        echo "Serialization Time: " . number_format($serializationTime, 4) . " seconds\n";
-        echo "Deserialization Time: " . number_format($deserializationTime, 4) . " seconds\n";
-        echo "Memory Usage: " . number_format($serializationMemory / 1024 / 1024, 2) . " MB\n";
-        echo "JSON Size: " . number_format(strlen($jsonTree) / 1024, 2) . " KB\n";
+        echo 'Serialization Time: '.number_format($serializationTime, 4)." seconds\n";
+        echo 'Deserialization Time: '.number_format($deserializationTime, 4)." seconds\n";
+        echo 'Memory Usage: '.number_format($serializationMemory / 1024 / 1024, 2)." MB\n";
+        echo 'JSON Size: '.number_format(strlen($jsonTree) / 1024, 2)." KB\n";
     });
 });
